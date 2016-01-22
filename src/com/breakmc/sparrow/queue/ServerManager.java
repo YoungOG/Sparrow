@@ -4,11 +4,12 @@ import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.utils.LocationSerialization;
 import com.breakmc.sparrow.utils.MessageManager;
 import com.breakmc.sparrow.utils.PlayerUtility;
-import com.empcraft.InSignsPlus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import org.bukkit.Instrument;
 import org.bukkit.Location;
+import org.bukkit.Note;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -114,8 +115,12 @@ public class ServerManager {
                 server.getServerQueue().getNormalQueue().remove(p.getUniqueId());
                 server.getServerQueue().getDonatorQueue().remove(p.getUniqueId());
 
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+                MessageManager.sendMessage(p, "&3You are currently position &b#" + (PlayerUtility.findPosition(p.getUniqueId(), server.getServerQueue()) + 1) + " &3in the &b" + server.getName() + " &3queue.");
+                MessageManager.sendMessage(p, "&bYour " + PlayerUtility.getGroupColor(p.getName()) + " &brank has queued you in front of normal players!");
+                p.playNote(p.getLocation(), Instrument.PIANO, Note.sharp(1, Note.Tone.A));
+
+                PlayerUtility.updateSign(p, server.getServerSignLocation());
+                PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
                 MessageManager.sendMessage(p, "&cYou are already in the queue.");
             }
@@ -125,8 +130,12 @@ public class ServerManager {
                 server.getServerQueue().getSupremeQueue().remove(p.getUniqueId());
                 server.getServerQueue().getNormalQueue().remove(p.getUniqueId());
 
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+                MessageManager.sendMessage(p, "&3You are currently position &b#" + (PlayerUtility.findPosition(p.getUniqueId(), server.getServerQueue()) + 1) + " &3in the &b" + server.getName() + " &3queue.");
+                MessageManager.sendMessage(p, "&bYour " + PlayerUtility.getGroupColor(p.getName()) + " &brank has queued you in front of normal players!");
+                p.playNote(p.getLocation(), Instrument.PIANO, Note.sharp(1, Note.Tone.A));
+
+                PlayerUtility.updateSign(p, server.getServerSignLocation());
+                PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
                 MessageManager.sendMessage(p, "&cYou are already in the queue.");
             }
@@ -136,8 +145,8 @@ public class ServerManager {
                 server.getServerQueue().getSupremeQueue().remove(p.getUniqueId());
                 server.getServerQueue().getDonatorQueue().remove(p.getUniqueId());
 
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-                InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+                PlayerUtility.updateSign(p, server.getServerSignLocation());
+                PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
                 MessageManager.sendMessage(p, "&cYou are already in the queue.");
             }
@@ -147,24 +156,37 @@ public class ServerManager {
     public void removeFromServerQueue(Player p, Server server) {
         if (server.getServerQueue().getSupremeQueue().contains(p.getUniqueId())) {
             server.getServerQueue().getSupremeQueue().remove(p.getUniqueId());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
         }
         if (server.getServerQueue().getDonatorQueue().contains(p.getUniqueId())) {
             server.getServerQueue().getDonatorQueue().remove(p.getUniqueId());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
         }
         if (server.getServerQueue().getNormalQueue().contains(p.getUniqueId())) {
             server.getServerQueue().getNormalQueue().remove(p.getUniqueId());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getServerSignLocation());
-            InSignsPlus.getPlugin(InSignsPlus.class).updateSign(p, server.getQueueSignLocation());
+
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
+            PlayerUtility.updateSign(p, server.getServerSignLocation());
         }
+    }
+
+    public Server getServer(String name) {
+        for (Server s : servers) {
+            if (s.getName().equalsIgnoreCase(name)) {
+                return s;
+            }
+        }
+
+        return null;
     }
 
     public Server getServerFromServerSignLocation(Location location) {
         for (Server servers : getServers()) {
-            if (servers.getServerSignLocation().equals(location)) {
+            if (servers.getServerSignLocation() != null && servers.getServerSignLocation().equals(location)) {
                 return servers;
             }
         }
@@ -174,7 +196,7 @@ public class ServerManager {
 
     public Server getServerFromQueueSignLocation(Location location) {
         for (Server servers : getServers()) {
-            if (servers.getQueueSignLocation().equals(location)) {
+            if (servers.getQueueSignLocation() != null && servers.getQueueSignLocation().equals(location)) {
                 return servers;
             }
         }

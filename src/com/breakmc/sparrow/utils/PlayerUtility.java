@@ -2,15 +2,11 @@ package com.breakmc.sparrow.utils;
 
 import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.queue.ServerQueue;
+import de.blablubbabc.insigns.InSigns;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
@@ -19,21 +15,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.UUID;
 
 public class PlayerUtility {
-
-    public static double getHealth(Player p) {
-        return p.getHealth();
-    }
-
-    public static double getMaxHealth(Player p) { return p.getMaxHealth(); }
-
-    public static void setHealth(Player p, double health) { p.setHealth(health); }
-
-    public static double getDamage(EntityDamageByEntityEvent e) { return e.getDamage(); }
 
     public static Player[] getOnlinePlayers() {
         return Bukkit.getOnlinePlayers();
@@ -56,30 +41,22 @@ public class PlayerUtility {
         return groups[0].getName();
     }
 
-    public static boolean hasInventorySpace(Inventory inventory, ItemStack is) {
-        Inventory inv = Bukkit.createInventory(null, inventory.getSize());
+    public static String getGroupColor(String name) {
+        String group = getGroup(name);
 
-        for (int i = 0; i < inv.getSize(); i++) {
-            if (inventory.getItem(i) != null) {
-                ItemStack item = inventory.getItem(i).clone();
-                inv.setItem(i, item);
-            }
+        if (group.equalsIgnoreCase("Supreme")) {
+            return "&b" + group;
         }
 
-        return inv.addItem(new ItemStack[]{is.clone()}).size() <= 0;
-    }
-
-    public static int checkSlotsAvailable(Inventory inv) {
-        ItemStack[] items = inv.getContents();
-        int emptySlots = 0;
-
-        for (ItemStack is : items) {
-            if (is == null) {
-                emptySlots = emptySlots + 1;
-            }
+        if (group.equalsIgnoreCase("Enhanced")) {
+            return "&e" + group;
         }
 
-        return emptySlots;
+        if (group.equalsIgnoreCase("Member")) {
+            return "&a" + group;
+        }
+
+        return "&7" + group;
     }
 
     public static void connect(Player p, String channel) {
@@ -122,5 +99,15 @@ public class PlayerUtility {
         }
 
         return pos;
+    }
+
+    public static void updateSign(Player p, Location loc) {
+        Sign s = (Sign) loc.getWorld().getBlockAt(loc).getState();
+
+        if (s != null) {
+            if (p.getLocation().distance(loc) < 20) {
+                InSigns.sendSignChange(p, s);
+            }
+        }
     }
 }

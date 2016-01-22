@@ -5,7 +5,8 @@ import com.breakmc.sparrow.queue.Server;
 import com.breakmc.sparrow.queue.ServerManager;
 import com.breakmc.sparrow.utils.Cooldowns;
 import com.breakmc.sparrow.utils.MessageManager;
-import com.empcraft.InSignsPlus;
+import com.breakmc.sparrow.utils.PlayerUtility;
+import de.blablubbabc.insigns.SignSendEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -53,6 +54,12 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         e.setQuitMessage(null);
+
+        for (Server s : serverManager.getServers()) {
+            if (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId())) {
+                serverManager.removeFromServerQueue(e.getPlayer(), s);
+            }
+        }
     }
 
     @EventHandler
@@ -138,8 +145,8 @@ public class PlayerListeners implements Listener {
 
                     serverManager.createServer(p, name, maxPlayerCount, (Sign) e.getBlock().getState());
 
-                    e.setLine(0, ChatColor.translateAlternateColorCodes('&', "&3{sn}"));
-                    e.setLine(1, ChatColor.translateAlternateColorCodes('&', "&b{aa}&7/&b{bb}"));
+                    e.setLine(0, ChatColor.translateAlternateColorCodes('&', "{sn}"));
+                    e.setLine(1, ChatColor.translateAlternateColorCodes('&', "{aa}&7/{bb}"));
                     e.setLine(2, ChatColor.translateAlternateColorCodes('&', "{ln1}"));
                     e.setLine(3, ChatColor.translateAlternateColorCodes('&', "{ln2}"));
                     e.getBlock().getState().update(true);
@@ -169,9 +176,9 @@ public class PlayerListeners implements Listener {
                 server.setQueueSignLocation(e.getBlock().getState().getLocation());
 
                 e.setLine(0, ChatColor.translateAlternateColorCodes('&', "&3Current Queue"));
-                e.setLine(1, ChatColor.translateAlternateColorCodes('&', "&bSupreme &a{s}"));
-                e.setLine(2, ChatColor.translateAlternateColorCodes('&', "&bDonator &a{d}"));
-                e.setLine(3, ChatColor.translateAlternateColorCodes('&', "&7Normal &a{n}"));
+                e.setLine(1, ChatColor.translateAlternateColorCodes('&', "&bSupreme {s}"));
+                e.setLine(2, ChatColor.translateAlternateColorCodes('&', "&bDonator {d}"));
+                e.setLine(3, ChatColor.translateAlternateColorCodes('&', "&7Normal {n}"));
                 e.getBlock().getState().update(true);
                 MessageManager.sendMessage(p, "&aSuccessfully created Queue sign for server: &a" + server.getName());
             }
@@ -240,5 +247,52 @@ public class PlayerListeners implements Listener {
 
         if ((p.getGameMode() != GameMode.CREATIVE) && (p.getLocation().subtract(0, 1, 0).getBlock().getType() != Material.AIR) && (!p.isFlying()))
             p.setAllowFlight(true);
+    }
+
+    @EventHandler
+    public void onSignSend(SignSendEvent e) {
+        for (int i = 0; i < 4; i++) {
+            String line = e.getLine(i);
+
+            if (serverManager.getServerFromServerSignLocation(e.getLocation()) != null) {
+                Server s = serverManager.getServerFromServerSignLocation(e.getLocation());
+
+                if (line.contains("{sn}")) {
+                    e.setLine(i, e.getLine(i).replace("{sn}", ChatColor.translateAlternateColorCodes('&', "&3" + s.getName())));
+                }
+
+                if (line.contains("{aa}")) {
+                    e.setLine(i, e.getLine(i).replace("{aa}", ChatColor.translateAlternateColorCodes('&', "&b" + s.getPlayerCount())));
+                }
+
+                if (line.contains("{bb}")) {
+                    e.setLine(i, e.getLine(i).replace("{bb}", ChatColor.translateAlternateColorCodes('&', "&b" + s.getMaxPlayerCount())));
+                }
+
+                if (line.contains("{ln1}")) {
+                    e.setLine(i, e.getLine(i).replace("{ln1}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&aYour Position" : "&aClick to join"))));
+                }
+
+                if (line.contains("{ln2}")) {
+                    e.setLine(i, e.getLine(i).replace("{ln2}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&e" + (PlayerUtility.findPosition(e.getPlayer().getUniqueId(), s.getServerQueue()) + 1) + " of " + s.getServerQueue().getFullQueue().size() : "&athe queue!"))));
+                }
+            }
+
+            if (serverManager.getServerFromQueueSignLocation(e.getLocation()) != null) {
+                Server s = serverManager.getServerFromQueueSignLocation(e.getLocation());
+
+                if (line.contains("{s}")) {
+                    e.setLine(i, e.getLine(i).replace("{s}", ChatColor.translateAlternateColorCodes('&', "&b" + s.getServerQueue().getSupremeQueue().size())));
+                }
+
+                if (line.contains("{d}")) {
+                    e.setLine(i, e.getLine(i).replace("{d}", ChatColor.translateAlternateColorCodes('&', "&b" + s.getServerQueue().getDonatorQueue().size())));
+                }
+
+                if (line.contains("{n}")) {
+                    e.setLine(i, e.getLine(i).replace("{n}", ChatColor.translateAlternateColorCodes('&', "&b" + s.getServerQueue().getNormalQueue().size())));
+                }
+            }
+        }
     }
 }

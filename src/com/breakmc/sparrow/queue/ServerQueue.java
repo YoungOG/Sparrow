@@ -1,13 +1,12 @@
 package com.breakmc.sparrow.queue;
 
 import com.breakmc.sparrow.Sparrow;
+import com.breakmc.sparrow.utils.Cooldowns;
 import com.breakmc.sparrow.utils.MessageManager;
 import com.breakmc.sparrow.utils.PlayerUtility;
-import com.empcraft.InSignsPlus;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -24,40 +23,26 @@ public class ServerQueue {
     private Queue<UUID> donatorQueue = new LinkedList<>();
     private Queue<UUID> normalQueue = new LinkedList<>();
     private boolean paused;
-    private int seconds = 2;
 
     public ServerQueue(Server server) {
         this.server = server;
         this.paused = false;
-
-        updateQueue();
-    }
-
-    public void updateQueue() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (isPaused()) {
-                    setSeconds(10);
-                } else {
-                    setSeconds(2);
-                }
-            }
-        }.runTaskTimerAsynchronously(Sparrow.getInstance(), 0L, 20L);
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (isPaused()) {
                     for (UUID id : getFullQueue()) {
-                        MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
-                        MessageManager.sendMessage(id, "&r");
-                        MessageManager.sendMessage(id, "&r &r&cThe queue is currently paused!");
-                        MessageManager.sendMessage(id, "&r &r&cQueuing will resume shortly!");
-                        MessageManager.sendMessage(id, "&r");
-                        MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
+                        if (Cooldowns.tryCooldown(id, "paused-cooldown", 10000)) {
+                            MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
+                            MessageManager.sendMessage(id, "&r");
+                            MessageManager.sendMessage(id, "&r &r&cThe queue is currently paused.");
+                            MessageManager.sendMessage(id, "&r &r&cQueuing will resume shortly!");
+                            MessageManager.sendMessage(id, "&r");
+                            MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
+                        }
                     }
-                } else {
+                } else if (!server.isWhitelisted()) {
                     if (getFullQueue().size() > 0) {
                         ArrayList<UUID> joinList = new ArrayList<>();
                         int count = 0;
@@ -77,12 +62,7 @@ public class ServerQueue {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(Sparrow.getInstance(), 0L, getSeconds()*20L);
-    }
-
-    public void addToSupremeQueue(Player p) {
-        supremeQueue.add(p.getUniqueId());
-        InSignsPlus.getPlugin(InSignsPlus.class).updateAllSigns(p, p.getLocation());
+        }.runTaskTimerAsynchronously(Sparrow.getInstance(), 0L, 2*20L);
     }
 
     public boolean isInQueue(UUID id) {

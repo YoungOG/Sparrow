@@ -1,5 +1,5 @@
 name: Sparrow
 main: com.breakmc.sparrow.Sparrow
 version: 0.0.1
-depend: [InSignsPlus]
+depend: [InSigns]
 author: Young

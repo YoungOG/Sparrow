@@ -2,7 +2,6 @@ package com.breakmc.sparrow.queue;
 
 import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.utils.PlayerUtility;
-import com.empcraft.InSignsPlus;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -19,6 +18,7 @@ public class Server {
     private Location serverSignLocation;
     private Location queueSignLocation;
     private ServerQueue serverQueue;
+    private boolean isWhitelisted;
 
     public Server(String name, int maxPlayerCount, Location serverSignLocation) {
         this.name = name;
@@ -26,6 +26,7 @@ public class Server {
         this.maxPlayerCount = maxPlayerCount;
         this.serverSignLocation = serverSignLocation;
         this.serverQueue = new ServerQueue(this);
+        this.isWhitelisted = false;
 
         new BukkitRunnable() {
             @Override
@@ -35,11 +36,11 @@ public class Server {
                 }
                 for (Player all : PlayerUtility.getOnlinePlayers()) {
                     if (serverSignLocation != null) {
-                        InSignsPlus.getPlugin(InSignsPlus.class).updateSign(all, serverSignLocation);
+                        PlayerUtility.updateSign(all, serverSignLocation);
                     }
 
                     if (queueSignLocation != null) {
-                        InSignsPlus.getPlugin(InSignsPlus.class).updateSign(all, queueSignLocation);
+                        PlayerUtility.updateSign(all, queueSignLocation);
                     }
                 }
             }
