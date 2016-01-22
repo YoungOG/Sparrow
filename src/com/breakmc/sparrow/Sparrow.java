@@ -2,8 +2,8 @@ package com.breakmc.sparrow;
 
 import com.breakmc.sparrow.commands.ServerCommand;
 import com.breakmc.sparrow.listeners.PlayerListeners;
-import com.breakmc.sparrow.queue.Server;
-import com.breakmc.sparrow.queue.ServerManager;
+import com.breakmc.sparrow.server.Server;
+import com.breakmc.sparrow.server.ServerManager;
 import com.breakmc.sparrow.utils.command.Register;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -41,6 +41,7 @@ public class Sparrow extends JavaPlugin implements PluginMessageListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         getServer().getPluginManager().registerEvents(new PlayerListeners(), this);
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
@@ -48,6 +49,7 @@ public class Sparrow extends JavaPlugin implements PluginMessageListener {
 
     public void onDisable() {
         serverManager.saveServers();
+        serverManager.saveSpawn();
     }
 
     public void setupDatabase() {

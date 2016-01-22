@@ -1,7 +1,7 @@
 package com.breakmc.sparrow.utils;
 
 import com.breakmc.sparrow.Sparrow;
-import com.breakmc.sparrow.queue.ServerQueue;
+import com.breakmc.sparrow.server.ServerQueue;
 import de.blablubbabc.insigns.InSigns;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

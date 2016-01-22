@@ -1,4 +1,4 @@
-package com.breakmc.sparrow.queue;
+package com.breakmc.sparrow.server;
 
 import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.utils.LocationSerialization;
@@ -19,16 +19,20 @@ import java.util.ArrayList;
 public class ServerManager {
 
     private Sparrow main = Sparrow.getInstance();
+    private DBCollection mCollection = main.getDB().getCollection("main");
     private DBCollection sCollection = main.getDB().getCollection("servers");
     private ArrayList<Server> servers = new ArrayList<>();
+    private Location spawnLocation;
 
     public ServerManager() {
         loadServers();
+        loadSpawn();
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 saveServers();
+                saveSpawn();
             }
         }.runTaskTimer(main, 0L, 300*20L);
     }
@@ -79,6 +83,45 @@ public class ServerManager {
         System.out.println("Saved " + servers.size() + " servers");
     }
 
+    public void loadSpawn() {
+        DBCursor dbc = mCollection.find(new BasicDBObject("spawn", "searchBy"));
+
+        if (dbc.hasNext()) {
+            BasicDBObject dbo = (BasicDBObject) dbc.next();
+
+            if (dbo.getString("spawnLocation") != null) {
+                spawnLocation = LocationSerialization.deserializeLocation(dbo.getString("spawnLocation"));
+            } else {
+                System.out.println("Failed to load spawn. (MongoDB document found)");
+            }
+        } else {
+            System.out.println("Failed to load spawn. (Not Saved)");
+        }
+    }
+
+    public void saveSpawn() {
+        if (spawnLocation != null) {
+            DBCursor dbc = mCollection.find(new BasicDBObject("spawn", "searchBy"));
+
+            if (dbc.hasNext()) {
+                BasicDBObject dbo = new BasicDBObject("spawn", "searchBy");
+
+                dbo.append("spawnLocation", LocationSerialization.serializeLocation(spawnLocation));
+
+                mCollection.update(dbc.next(), dbo);
+
+                System.out.println("Spawn Location X: " + spawnLocation.getBlockX() + " Y: " + spawnLocation.getBlockY() + " Z: " + spawnLocation.getBlockZ() + " saved!");
+            } else {
+                BasicDBObject dbo = new BasicDBObject("spawn", "searchBy");
+
+                dbo.append("spawnLocation", LocationSerialization.serializeLocation(spawnLocation));
+
+                mCollection.insert(dbo);
+                System.out.println("Spawn Location X: " + spawnLocation.getBlockX() + " Y: " + spawnLocation.getBlockY() + " Z: " + spawnLocation.getBlockZ() + " saved!");
+            }
+        }
+    }
+
     public void createServer(Player p, String name, int maxPlayerCount, Sign sign) {
         Server server = new Server(name, maxPlayerCount, sign.getLocation());
         servers.add(server);
@@ -122,7 +165,7 @@ public class ServerManager {
                 PlayerUtility.updateSign(p, server.getServerSignLocation());
                 PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
-                MessageManager.sendMessage(p, "&cYou are already in the queue.");
+                MessageManager.sendMessage(p, "&cYou are already in the server.");
             }
         } else if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Enhanced") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Member")) {
             if (!server.getServerQueue().getDonatorQueue().contains(p.getUniqueId())) {
@@ -137,7 +180,7 @@ public class ServerManager {
                 PlayerUtility.updateSign(p, server.getServerSignLocation());
                 PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
-                MessageManager.sendMessage(p, "&cYou are already in the queue.");
+                MessageManager.sendMessage(p, "&cYou are already in the server.");
             }
         } else {
             if (!server.getServerQueue().getNormalQueue().contains(p.getUniqueId())) {
@@ -148,7 +191,7 @@ public class ServerManager {
                 PlayerUtility.updateSign(p, server.getServerSignLocation());
                 PlayerUtility.updateSign(p, server.getQueueSignLocation());
             } else {
-                MessageManager.sendMessage(p, "&cYou are already in the queue.");
+                MessageManager.sendMessage(p, "&cYou are already in the server.");
             }
         }
     }
@@ -202,6 +245,14 @@ public class ServerManager {
         }
 
         return null;
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation;
+    }
+
+    public void setSpawnLocation(Location spawnLocation) {
+        this.spawnLocation = spawnLocation;
     }
 
     public ArrayList<Server> getServers() {

@@ -1,15 +1,14 @@
 package com.breakmc.sparrow.listeners;
 
 import com.breakmc.sparrow.Sparrow;
-import com.breakmc.sparrow.queue.Server;
-import com.breakmc.sparrow.queue.ServerManager;
+import com.breakmc.sparrow.server.Server;
+import com.breakmc.sparrow.server.ServerManager;
 import com.breakmc.sparrow.utils.Cooldowns;
 import com.breakmc.sparrow.utils.MessageManager;
 import com.breakmc.sparrow.utils.PlayerUtility;
 import de.blablubbabc.insigns.SignSendEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -36,7 +35,7 @@ public class PlayerListeners implements Listener {
         Player p = e.getPlayer();
         e.setJoinMessage(null);
 
-        p.teleport(new Location(p.getWorld(), -0.5, 69, 0.5));
+        p.teleport(serverManager.getSpawnLocation());
         p.getInventory().clear();
         p.updateInventory();
 
@@ -99,7 +98,7 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (e.getTo().getBlockY() <= 0) {
-            e.getPlayer().teleport(new Location(e.getPlayer().getWorld(), -0.5, 69, 0.5));
+            e.getPlayer().teleport(serverManager.getSpawnLocation());
         }
     }
 
@@ -180,7 +179,7 @@ public class PlayerListeners implements Listener {
                 e.setLine(2, ChatColor.translateAlternateColorCodes('&', "&bDonator {d}"));
                 e.setLine(3, ChatColor.translateAlternateColorCodes('&', "&7Normal {n}"));
                 e.getBlock().getState().update(true);
-                MessageManager.sendMessage(p, "&aSuccessfully created Queue sign for server: &a" + server.getName());
+                MessageManager.sendMessage(p, "&aSuccessfully created Queue sign for server: &a" + server.getName() + "&a.");
             }
         }
     }
@@ -204,7 +203,7 @@ public class PlayerListeners implements Listener {
                             serverManager.removeFromServerQueue(p, server);
                         }
                     } else {
-                        MessageManager.sendMessage(p, "&cDon't spam the queue.");
+                        MessageManager.sendMessage(p, "&cDo not spam the sign.");
                     }
                 }
             }
@@ -274,7 +273,7 @@ public class PlayerListeners implements Listener {
                 }
 
                 if (line.contains("{ln2}")) {
-                    e.setLine(i, e.getLine(i).replace("{ln2}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&e" + (PlayerUtility.findPosition(e.getPlayer().getUniqueId(), s.getServerQueue()) + 1) + " of " + s.getServerQueue().getFullQueue().size() : "&athe queue!"))));
+                    e.setLine(i, e.getLine(i).replace("{ln2}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&e" + (PlayerUtility.findPosition(e.getPlayer().getUniqueId(), s.getServerQueue()) + 1) + " of " + s.getServerQueue().getFullQueue().size() : "&athe server!"))));
                 }
             }
 

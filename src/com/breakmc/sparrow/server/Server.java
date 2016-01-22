@@ -1,4 +1,4 @@
-package com.breakmc.sparrow.queue;
+package com.breakmc.sparrow.server;
 
 import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.utils.PlayerUtility;

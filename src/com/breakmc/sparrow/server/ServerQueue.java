@@ -1,4 +1,4 @@
-package com.breakmc.sparrow.queue;
+package com.breakmc.sparrow.server;
 
 import com.breakmc.sparrow.Sparrow;
 import com.breakmc.sparrow.utils.Cooldowns;
@@ -36,7 +36,7 @@ public class ServerQueue {
                         if (Cooldowns.tryCooldown(id, "paused-cooldown", 10000)) {
                             MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
                             MessageManager.sendMessage(id, "&r");
-                            MessageManager.sendMessage(id, "&r &r&cThe queue is currently paused.");
+                            MessageManager.sendMessage(id, "&r &r&cThe server is currently paused.");
                             MessageManager.sendMessage(id, "&r &r&cQueuing will resume shortly!");
                             MessageManager.sendMessage(id, "&r");
                             MessageManager.sendMessage(id, "&4&m-----------------------------------------------------");
