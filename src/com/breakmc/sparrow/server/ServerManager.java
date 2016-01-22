@@ -167,7 +167,7 @@ public class ServerManager {
             } else {
                 MessageManager.sendMessage(p, "&cYou are already in the server.");
             }
-        } else if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Enhanced") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Member")) {
+        } else if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("enhanced") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("member")) {
             if (!server.getServerQueue().getDonatorQueue().contains(p.getUniqueId())) {
                 server.getServerQueue().getDonatorQueue().offer(p.getUniqueId());
                 server.getServerQueue().getSupremeQueue().remove(p.getUniqueId());

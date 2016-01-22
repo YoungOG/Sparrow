@@ -24,7 +24,7 @@ public class ServerCommand extends BaseCommand {
         super("serversign", "sparrow.admin", CommandUsageBy.ANYONE);
         setUsage("&cImproper usage! /serversign");
         setMinArgs(0);
-        setMaxArgs(2);
+        setMaxArgs(3);
     }
 
     @Override
@@ -33,8 +33,9 @@ public class ServerCommand extends BaseCommand {
             MessageManager.sendMessage(sender, "&7&m----------&r&7[ &bServer Command &7]&m----------");
             MessageManager.sendMessage(sender, "&r &r&3/serversign &7- Displays this page.");
             MessageManager.sendMessage(sender, "&r &r&3/serversign setspawn &7- Sets the server spawn.");
+            MessageManager.sendMessage(sender, "&r &r&3/serversign maxslots &7(&bserver&7) (&bcount&7) - Set a servers max slots.");
             MessageManager.sendMessage(sender, "&r &r&3/serversign whitelist &7(&bserver&7) - Toggle servers whitelist.");
-            MessageManager.sendMessage(sender, "&r &r&3/serversign pause &7(&bserver&7) - Pause the server of a server.");
+            MessageManager.sendMessage(sender, "&r &r&3/serversign pause &7(&bserver&7) - Pause the queue of a server.");
             MessageManager.sendMessage(sender, "&7&m------------------------------------");
         } else if (args.length == 1) {
             if (args[0].equalsIgnoreCase("setspawn")) {
@@ -89,6 +90,26 @@ public class ServerCommand extends BaseCommand {
                         MessageManager.sendMessage(id, "&r");
                         MessageManager.sendMessage(id, "&2&m-----------------------------------------------------");
                     }
+                }
+            } else {
+                MessageManager.sendMessage(sender, getUsage());
+            }
+        } else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("maxslots")) {
+                Server server = serverManager.getServer(args[1]);
+
+                if (server == null) {
+                    MessageManager.sendMessage(sender, "&cCould not find that server.");
+                    return;
+                }
+
+                try {
+                    int maxSlots = Integer.parseInt(args[2]);
+
+                    server.setMaxPlayerCount(maxSlots);
+                    MessageManager.sendMessage(sender, "&aServer &b" + server.getName() + " &amax player count has been set to &e" + server.getMaxPlayerCount() + "&a.");
+                } catch (NumberFormatException e) {
+                    MessageManager.sendMessage(sender, "&cYou must enter a valid number.");
                 }
             } else {
                 MessageManager.sendMessage(sender, getUsage());

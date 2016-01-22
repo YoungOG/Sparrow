@@ -48,6 +48,10 @@ public class ServerQueue {
                         int count = 0;
 
                         for (UUID id : getFullQueue()) {
+                            if (PlayerUtility.getGroup(Bukkit.getPlayer(id).getName()).equalsIgnoreCase("normal") && server.getPlayerCount() >= server.getMaxPlayerCount()) {
+                                return;
+                            }
+
                             if (count < 3) {
                                 count++;
                                 joinList.add(id);
