@@ -56,6 +56,14 @@ public class PlayerUtility {
             return "&a" + group;
         }
 
+        if (group.equalsIgnoreCase("Youtube+")) {
+            return "&d" + group.replace("+", "&c+").replace("t", "T");
+        }
+
+        if (group.equalsIgnoreCase("Youtube")) {
+            return "&d" + group.replace("t", "T");
+        }
+
         return "&7" + group;
     }
 

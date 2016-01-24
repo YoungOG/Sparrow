@@ -152,7 +152,7 @@ public class ServerManager {
             return;
         }
 
-        if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("supreme")) {
+        if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("supreme") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Youtube+")) {
             if (!server.getServerQueue().getSupremeQueue().contains(p.getUniqueId())) {
                 server.getServerQueue().getSupremeQueue().offer(p.getUniqueId());
                 server.getServerQueue().getNormalQueue().remove(p.getUniqueId());
@@ -167,7 +167,7 @@ public class ServerManager {
             } else {
                 MessageManager.sendMessage(p, "&cYou are already in the server.");
             }
-        } else if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("enhanced") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("member")) {
+        } else if (PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("enhanced") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("member") || PlayerUtility.getGroup(p.getName()).equalsIgnoreCase("Youtube")) {
             if (!server.getServerQueue().getDonatorQueue().contains(p.getUniqueId())) {
                 server.getServerQueue().getDonatorQueue().offer(p.getUniqueId());
                 server.getServerQueue().getSupremeQueue().remove(p.getUniqueId());

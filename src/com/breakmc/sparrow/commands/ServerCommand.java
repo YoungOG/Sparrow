@@ -9,6 +9,8 @@ import com.breakmc.sparrow.utils.command.CommandUsageBy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -82,7 +84,24 @@ public class ServerCommand extends BaseCommand {
                     server.getServerQueue().setPaused(false);
                     MessageManager.sendMessage(sender, "&aYou have resumed the server for &b" + server.getName());
 
-                    for (UUID id : server.getServerQueue().getFullQueue()) {
+                    LinkedList<UUID> queue = new LinkedList<>();
+
+                    ListIterator<UUID> supremeItr = server.getServerQueue().getSupremeQueue().listIterator();
+                    while (supremeItr.hasNext()) {
+                        queue.add(server.getServerQueue().getSupremeQueue().pollFirst());
+                    }
+
+                    ListIterator<UUID> donatorItr = server.getServerQueue().getDonatorQueue().listIterator();
+                    while (donatorItr.hasNext()) {
+                        queue.add(server.getServerQueue().getDonatorQueue().pollFirst());
+                    }
+
+                    ListIterator<UUID> normalItr = server.getServerQueue().getNormalQueue().listIterator();
+                    while (normalItr.hasNext()) {
+                        queue.add(server.getServerQueue().getNormalQueue().pollFirst());
+                    }
+
+                    for (UUID id : queue) {
                         MessageManager.sendMessage(id, "&2&m-----------------------------------------------------");
                         MessageManager.sendMessage(id, "&r");
                         MessageManager.sendMessage(id, "&r &r&aThe server has been unpaused.");

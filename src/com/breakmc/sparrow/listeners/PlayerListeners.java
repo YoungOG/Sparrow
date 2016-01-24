@@ -273,7 +273,7 @@ public class PlayerListeners implements Listener {
                 }
 
                 if (line.contains("{ln2}")) {
-                    e.setLine(i, e.getLine(i).replace("{ln2}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&e" + (PlayerUtility.findPosition(e.getPlayer().getUniqueId(), s.getServerQueue()) + 1) + " of " + s.getServerQueue().getFullQueue().size() : "&athe server!"))));
+                    e.setLine(i, e.getLine(i).replace("{ln2}", ChatColor.translateAlternateColorCodes('&', (s.getServerQueue().isInQueue(e.getPlayer().getUniqueId()) ? "&e" + (PlayerUtility.findPosition(e.getPlayer().getUniqueId(), s.getServerQueue()) + 1) + " of " + (s.getServerQueue().getSupremeQueue().size() + s.getServerQueue().getDonatorQueue().size() + s.getServerQueue().getNormalQueue().size()) : "&athe server!"))));
                 }
             }
 
